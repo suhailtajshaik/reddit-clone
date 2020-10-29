@@ -108,7 +108,17 @@ export default function PostCard(props) {
         const subreddit = subreddits.filter(subreddit => (subreddit.id === id));
         return (subreddit.length > 0) ? subreddit[0][key] : null;
     }
-
+    function isImageUrl(url) {
+        return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+    }
+    const renderPostURL = () => {
+        if (post.imageURL) {
+            return isImageUrl(post.imageURL) ? <>Display Image hear </> : <Typography variant="body2" gutterBottom>
+                <a href={post.imageURL} target="_blank">{post.imageURL}</a>
+            </Typography>
+        }
+        return null;
+    }
     return (
         <div className={classes.root}>
             <Paper className={classes.paper}>
@@ -128,25 +138,26 @@ export default function PostCard(props) {
                     <Grid item xs={11} sm container>
                         <Grid item xs container direction="column" spacing={1}>
                             <Grid item xs>
-                                <Typography variant="subtitle2" gutterBottom>
+                                <Typography variant="subtitle1" gutterBottom>
                                     <Link to={`/r/${getSubredditDetails(post.subreddit_id, 'name')}`} className={classes.subredditLink}>{`r/${getSubredditDetails(post.subreddit_id, 'name')}`}</Link>
                                     <span className={classes.timeSencePosted}>
                                         {timeSincePosted(post.created_at)}
                                     </span>
                                 </Typography>
 
-                                <Typography variant="subtitle2" gutterBottom>
+                                <Typography variant="h6" gutterBottom>
                                     {post.title}
                                 </Typography>
                                 <Typography variant="body2" gutterBottom>
-                                    {post.title}
+                                    {post.description}
                                 </Typography>
+                                {renderPostURL()}
                             </Grid>
-                            <Grid item>
+                            {/* <Grid item>
                                 <Typography variant="body2" style={{ cursor: 'pointer' }}>
                                     Remove
                                 </Typography>
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                     </Grid>
                 </Grid>

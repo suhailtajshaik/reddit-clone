@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
 import { useSubreddit } from '../../contexts/SubredditContext';
 import { usePosts } from '../../contexts/PostContext';
 import { Container } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-
+import Paper from '@material-ui/core/Paper';
 import PostCard from './postCard';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,11 +24,21 @@ const useStyles = makeStyles((theme) => ({
 
 const Subreddits = () => {
     const classes = useStyles();
+    const [subreddits, setsubreddits] = useState([])
     const { getSubreddits } = useSubreddit();
     const { getAllPosts, posts } = usePosts();
 
-    const subreddits = () => {
-        let subreddits = getSubreddits();
+    useEffect(() => {
+        const allSubreditsList = getSubreddits();
+        setsubreddits(allSubreditsList);
+    }, [getSubreddits])
+
+    useEffect(() => {
+        getAllPosts()
+    })
+
+    const renderSubreddits = () => {
+        // let subreddits = getSubreddits();
         // let postOptions = {
         //     'orderByKey': 'created_at',
         //     'orderByParam': 'asc',
@@ -59,6 +68,9 @@ const Subreddits = () => {
                                 <PostCard post={post} />
                             </div>)
                         })}
+                        <Paper>
+                            {renderSubreddits()}
+                        </Paper>
                     </Grid>
                 </Grid>
             </div>

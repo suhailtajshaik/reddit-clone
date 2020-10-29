@@ -23,7 +23,7 @@ export function SubredditProvider({ children }) {
     }
 
     function getSubreddits() {
-        db.collection('subreddits').orderBy('created_at', 'asc').onSnapshot((snapshot) => {
+        db.collection('subreddits').orderBy('created_at', 'desc').onSnapshot((snapshot) => {
             const subredditsList = getCollectionData(snapshot);
             setSubreddits(subredditsList);
         })

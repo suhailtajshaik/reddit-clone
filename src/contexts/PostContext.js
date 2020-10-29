@@ -7,12 +7,17 @@ export function usePosts() {
     return useContext(PostContext)
 }
 
+export const postOptions = {
+    'orderByKey': 'created_at',
+    'orderByParam': 'desc'
+}
+
 export function PostProvider({ children }) {
     const [posts, setPosts] = useState([]);
     const [selectedPostsById, setSelectedPostsById] = useState([]);
 
     useEffect(() => {
-        const unSubscribePost = db.collection('posts').orderBy('created_at', 'asc').limit(10).onSnapshot((snapshot) => {
+        const unSubscribePost = db.collection('posts').orderBy(postOptions.orderByKey, postOptions.orderByParam).onSnapshot((snapshot) => {
             const allPosts = getCollectionData(snapshot);
             setPosts(allPosts);
         });

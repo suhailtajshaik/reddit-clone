@@ -70,7 +70,7 @@ const CreatePostForm = (props) => {
                         margin="normal"
                         variant="outlined"
                         name="title"
-                        inputRef={register({ required: { value: true, message: "Title is required!" }, maxLength: { value: 50, message: "Max length of 50 characters allowed!" } })}
+                        inputRef={register({ required: { value: true, message: "Title is required!" } })}
                         error={errors.title}
                         aria-invalid={has(errors, 'title.name') ? "true" : "false"}
                         helperText={(errors.title) ? errors.title.message : ""}
