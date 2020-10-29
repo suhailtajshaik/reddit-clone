@@ -1,14 +1,24 @@
-import React, { useContext, useState } from "react"
-import { db } from "../firebase";
+import React, { useContext, useState, useEffect } from "react"
+import { db } from "../firebase"
 
-const PostsContext = React.createContext()
+const PostContext = React.createContext()
 
 export function usePosts() {
-    return useContext(PostsContext)
+    return useContext(PostContext)
 }
 
-export function PostsProvider({ children }) {
-    const [posts, setPosts] = useState([])
+export function PostProvider({ children }) {
+    const [posts, setPosts] = useState([]);
+    const [selectedPostsById, setSelectedPostsById] = useState([]);
+
+    useEffect(() => {
+        const unSubscribePost = db.collection('posts').orderBy('created_at', 'asc').limit(10).onSnapshot((snapshot) => {
+            const allPosts = getCollectionData(snapshot);
+            setPosts(allPosts);
+        });
+
+        return () => unSubscribePost
+    }, [])
 
     // Get array of doc data from collection
     function getCollectionData(collection) {
@@ -22,58 +32,48 @@ export function PostsProvider({ children }) {
         return doc.exists === true ? { id: doc.id, ...doc.data() } : null;
     }
 
-    function createPost(params) {
+    async function createPost(params, history) {
+        let ref = db.collection("posts").doc();
         const postData = {
-            "id": db.collection("posts").doc(`${post.id}`),
-            "image": params.imageUrl || '',
-            "title": params.title,
-            "description": params.description,
-            "user_id": "",
-            "subreddit_id": params.subreddit_id,
-            "created_at": new Date().toISOString(),
-            "updated_at": new Date().toISOString()
+            "id": `${ref.id}`,
+            ...params,
+            "url": `${params.url}${ref.id}`,
         }
 
-        try {
-            if (params.title && params.subreddit_id) {
-                db.collection("posts").doc(`${post.id}`).set(postData).then((res) => {
-                    console.log("RES : ", res);
-                });
-            } else {
-                throw new Error({ "message": 'Error creating post.' })
-            }
-        } catch (error) {
-            return error;
+        await db.collection("posts")
+            .doc(`${ref.id}`).set(postData).then(function () {
+                history.push(`/`);
+            }).catch(function (error) {
+                console.error("Error writing document: ", error);
+            });
+    }
+
+    function getPostsForSubredditById(id) {
+        if (posts.length > 0) {
+            const selectedPosts = posts.filter(post => (post.subreddit_id === id));
+            setSelectedPostsById(selectedPosts);
+            return selectedPosts;
         }
 
+    };
 
+    async function getAllPosts(options) {
 
-    }
-    function getPosts() {
-        db.collection('posts').orderBy('created_at', 'asc').onSnapshot((snapshot) => {
-            const postsList = getCollectionData(snapshot);
-            setPosts(postsList);
-        })
-        return posts;
-    }
+        return await posts;
 
-    function getPostDetailsFor(id) {
-        // if (posts.length > 0) {
-        //     return posts.filter(post => (post.id === id))[0];
-        // } else {
-        //     let subredditsList = getPosts();
-        //     return subredditsList.filter(post => (post.id === id))[0];
-        // }
     }
 
     const value = {
-        getPosts,
-        createPost
+        createPost,
+        getAllPosts,
+        getPostsForSubredditById,
+        posts,
+        selectedPostsById
     }
 
     return (
-        <PostsContext.Provider value={value}>
+        <PostContext.Provider value={value}>
             {children}
-        </PostsContext.Provider>
+        </PostContext.Provider>
     )
 }

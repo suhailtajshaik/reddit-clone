@@ -15,6 +15,7 @@ import ArrowDownwardOutlinedIcon from '@material-ui/icons/ArrowDownwardOutlined'
 import SubdirectoryArrowLeftIcon from '@material-ui/icons/SubdirectoryArrowLeft';
 
 import { useSubreddit } from '../../contexts/SubredditContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,14 +40,15 @@ const useStyles = makeStyles((theme) => ({
 
 const CreatePostCard = (props) => {
     const classes = useStyles();
+    const { currentUser } = useAuth();
     const [subreddit, setSubreddit] = useState('');
-    const { getSubredditDetailsFor } = useSubreddit();
+    const { getSubredditDetailsByName } = useSubreddit();
 
     const { history, subredditDetails } = props;
     useEffect(() => {
         if (!subredditDetails) {
             const searchKey = history.location.pathname.split('/')[2];
-            const selectedSubreddit = getSubredditDetailsFor(searchKey);
+            const selectedSubreddit = getSubredditDetailsByName(searchKey);
             setSubreddit(selectedSubreddit);
         } else {
             setSubreddit(subredditDetails);
@@ -62,7 +64,13 @@ const CreatePostCard = (props) => {
                 placeholder="Create post"
                 inputProps={{ 'aria-label': 'Create post' }}
                 onFocus={() => {
-                    history.push(`/r/${subreddit.name}/submit`)
+                    console.log("currentUser : ", currentUser.refreshToken);
+                    if (currentUser.refreshToken && currentUser.uid) {
+                        history.push({
+                            pathname: `/r/${subreddit.name}/submit`,
+                            state: { subreddit, user_id: currentUser.uid }
+                        })
+                    }
                 }}
             />
         </Paper>

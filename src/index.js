@@ -5,13 +5,16 @@ import './index.css';
 import App from './components/App';
 import { AuthProvider } from './contexts/AuthContext';
 import { SubredditProvider } from './contexts/SubredditContext';
+import { PostProvider } from './contexts/PostContext';
 
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
       <SubredditProvider>
-        <App />
+        <PostProvider>
+          <App />
+        </PostProvider>
       </SubredditProvider>
     </AuthProvider>
   </React.StrictMode>,

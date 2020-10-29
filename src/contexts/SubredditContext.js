@@ -30,7 +30,7 @@ export function SubredditProvider({ children }) {
         return subreddits;
     }
 
-    function getSubredditDetailsFor(name) {
+    function getSubredditDetailsByName(name) {
         if (subreddits.length > 0) {
             return subreddits.filter(subredit => (subredit.name === name))[0];
         } else {
@@ -39,9 +39,21 @@ export function SubredditProvider({ children }) {
         }
     }
 
+
+    function getSubredditDetailsById(id) {
+        if (subreddits.length > 0) {
+            return subreddits.filter(subredit => (subredit.id === id))[0];
+        } else {
+            let subredditsList = getSubreddits();
+            return subredditsList.filter(subredit => (subredit.id === id))[0];
+        }
+    }
+
+
     const value = {
         getSubreddits,
-        getSubredditDetailsFor
+        getSubredditDetailsByName,
+        getSubredditDetailsById
     }
 
     return (
